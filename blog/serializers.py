@@ -10,3 +10,12 @@ class BlogSerializer(serializers.ModelSerializer):
             'content',
             'date'
         ]
+
+
+class BlogCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = BlogComment
+        fields = [
+            "comment",
+            "date",
+        ]

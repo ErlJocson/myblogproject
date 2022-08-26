@@ -2,7 +2,7 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
-from .serializers import BlogSerializer
+from .serializers import *
 from .models import *
 
 
@@ -25,7 +25,6 @@ def get_blogs(request):
 
 @api_view(["POST"])
 def add_blog(request):
-    data = {}
     serializer = BlogSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -50,5 +49,26 @@ def update_blog(request, id):
 
 
 @api_view(["GET"])
-def get_comments(request):
-    return Response({"msg": "This are the comments"})
+def get_comments(request, blog_id):
+    data = {}
+    instance = BlogComment.objects.filter(blog_id=blog_id).order_by("date")
+    if instance:
+        data = BlogSerializer(instance, many=True)
+    return Response(data)
+
+
+@api_view(["DELETE"])
+def delete_comment(request, id):
+    instance = get_object_or_404(BlogComment, id=id)
+    instance.delete()
+    return Response({"msg": "comment is deleted"})
+
+
+@api_view(["PUT"])
+def update_comment(request, id):
+    instance = get_object_or_404(BlogComment, id=id)
+    serializer = BlogCommentSerializer(instance, data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_205_RESET_CONTENT)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
