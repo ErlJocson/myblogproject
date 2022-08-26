@@ -1,7 +1,9 @@
 from django.shortcuts import get_object_or_404
+
 from rest_framework.response import Response
 from rest_framework.decorators import api_view
 from rest_framework import status
+
 from .serializers import *
 from .models import *
 
@@ -54,8 +56,16 @@ def get_comments(request, blog_id):
     data = {}
     instance = BlogComment.objects.filter(blog_id=blog_id).order_by("date")
     if instance:
-        data = BlogSerializer(instance, many=True)
+        data = BlogCommentSerializer(instance, many=True).data
     return Response(data)
+
+
+@api_view(["POST"])
+def add_comment(request):
+    serializers = BlogCommentSerializer(data=request.data)
+    if serializers.is_valid():
+        serializers.save()
+    return Response(serializers.data, status=status.HTTP_201_CREATED)
 
 
 @api_view(["DELETE"])
