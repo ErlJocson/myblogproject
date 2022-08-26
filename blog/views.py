@@ -19,7 +19,7 @@ def get_blogs(request):
     data = {}
     instance = Blog.objects.all().order_by('date')
     if instance:
-        data['blogs'] = BlogSerializer(instance, many=True)
+        data = BlogSerializer(instance, many=True).data
     return Response(data)
 
 
@@ -48,6 +48,7 @@ def update_blog(request, id):
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
+# comments
 @api_view(["GET"])
 def get_comments(request, blog_id):
     data = {}
@@ -61,7 +62,7 @@ def get_comments(request, blog_id):
 def delete_comment(request, id):
     instance = get_object_or_404(BlogComment, id=id)
     instance.delete()
-    return Response({"msg": "comment is deleted"})
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(["PUT"])
