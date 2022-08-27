@@ -12,4 +12,7 @@ urlpatterns = [
     path("delete-comment/<int:id>", delete_comment),
     path("update-comment/<int:id>", update_comment),
     path("add-comment/", add_comment),
+
+    path("get-comments-anonymous/", get_comments_anonymous),
+    path("add-comments-anonymous/", add_comments_anonymous)
 ]

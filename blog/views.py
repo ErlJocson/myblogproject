@@ -97,8 +97,9 @@ def update_comment(request, id):
 
 
 # anonymous comments
+# the following functions will allow anyone to comment on a blog
 @api_view(["GET"])
-def get_comments(request):
+def get_comments_anonymous(request):
     data = {}
     instances = AnonymousComment.objects.all().order_by("date")
     if instances:
@@ -107,7 +108,7 @@ def get_comments(request):
 
 
 @api_view(["POST"])
-def add_comments(request):
+def add_comments_anonymous(request):
     serializer = AnonymousCommentSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
