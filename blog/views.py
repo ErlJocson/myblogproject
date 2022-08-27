@@ -94,3 +94,23 @@ def update_comment(request, id):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+# anonymous comments
+@api_view(["GET"])
+def get_comments(request):
+    data = {}
+    instances = AnonymousComment.objects.all().order_by("date")
+    if instances:
+        data = AnonymousCommentSerializer(instances, many=True).data
+    return Response(data, status=status.HTTP_200_OK)
+
+
+@api_view(["POST"])
+def add_comments(request):
+    serializer = AnonymousCommentSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)

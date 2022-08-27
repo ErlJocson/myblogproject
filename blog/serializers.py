@@ -24,3 +24,15 @@ class BlogCommentSerializer(serializers.ModelSerializer):
             "blog_id"
         ]
         read_only_fields = ["date"]
+
+
+class AnonymousCommentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = AnonymousComment
+        fields = [
+            "id",
+            "comment",
+            "name",
+            "email",
+        ]
+        read_only_fields = ["date"]

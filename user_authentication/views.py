@@ -44,11 +44,8 @@ def delete_user(request, id):
 @permission_classes([IsAuthenticated])
 def update_user(request):
     instance = get_object_or_404(User, id=id)
-    serializer = UserSerializer(instance, data = request.data)
+    serializer = UserSerializer(instance, data=request.data)
     if serializer.is_valid():
         serializer.save()
     return Response(status=status.HTTP_200_OK)
 
-
-def login_user():
-    return
