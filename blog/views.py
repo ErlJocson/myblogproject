@@ -11,9 +11,9 @@ from .models import *
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
-def get_blog(request, id):
+def get_blog(request, blog_id):
     data = {}
-    instance = get_object_or_404(Blog, id=id)
+    instance = get_object_or_404(Blog, id=blog_id)
     data = BlogSerializer(instance).data
     return Response(data)
 
@@ -39,16 +39,16 @@ def add_blog(request):
 
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
-def delete_blog(request, id):
-    instance = get_object_or_404(Blog, id=id)
+def delete_blog(request, blog_id):
+    instance = get_object_or_404(Blog, id=blog_id)
     instance.delete()
     return Response(status=status.HTTP_200_OK)
 
 
 @api_view(["PUT"])
 @permission_classes([IsAuthenticated])
-def update_blog(request, id):
-    instance = get_object_or_404(Blog, id=id)
+def update_blog(request, blog_id):
+    instance = get_object_or_404(Blog, id=blog_id)
     serializer = BlogSerializer(instance, data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -79,16 +79,16 @@ def add_comment(request):
 
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
-def delete_comment(request, id):
-    instance = get_object_or_404(BlogComment, id=id)
+def delete_comment(request, comment_id):
+    instance = get_object_or_404(BlogComment, id=comment_id)
     instance.delete()
     return Response(status=status.HTTP_201_CREATED)
 
 
 @api_view(["PUT"])
 @permission_classes([IsAuthenticated])
-def update_comment(request, id):
-    instance = get_object_or_404(BlogComment, id=id)
+def update_comment(request, comment_id):
+    instance = get_object_or_404(BlogComment, id=comment_id)
     serializer = BlogCommentSerializer(instance, data=request.data)
     if serializer.is_valid():
         serializer.save()

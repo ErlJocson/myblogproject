@@ -29,21 +29,23 @@ def create_user(request):
     serializer = UserSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
-    return Response(status=status.HTTP_201_CREATED)
+        return Response(status=status.HTTP_201_CREATED)
+    else:
+        return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["DELETE"])
 @permission_classes([IsAuthenticated])
-def delete_user(request, id):
-    instance = get_object_or_404(User, id=id)
+def delete_user(request, user_id):
+    instance = get_object_or_404(User, id=user_id)
     instance.delete()
     return Response(status=status.HTTP_201_CREATED)
 
 
 @api_view(["PUT"])
 @permission_classes([IsAuthenticated])
-def update_user(request):
-    instance = get_object_or_404(User, id=id)
+def update_user(request, user_id):
+    instance = get_object_or_404(User, id=user_id)
     serializer = UserSerializer(instance, data=request.data)
     if serializer.is_valid():
         serializer.save()
