@@ -26,10 +26,10 @@ INSTALLED_APPS = [
     "corsheaders",
 
     "blog",
-    "user_authentication",
+    "user_authentication"
 ]
 
-APPEND_SLASH = False
+APPEND_SLASH = True
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
