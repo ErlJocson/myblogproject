@@ -15,7 +15,7 @@ def get_blog(request, blog_id):
     data = {}
     instance = get_object_or_404(Blog, id=blog_id)
     data = BlogSerializer(instance).data
-    return Response(data)
+    return Response(data, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])
@@ -25,7 +25,7 @@ def get_blogs(request):
     instance = Blog.objects.all().order_by('date')
     if instance:
         data = BlogSerializer(instance, many=True).data
-    return Response(data)
+    return Response(data, status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])
@@ -42,18 +42,20 @@ def add_blog(request):
 def delete_blog(request, blog_id):
     instance = get_object_or_404(Blog, id=blog_id)
     instance.delete()
-    return Response(status=status.HTTP_200_OK)
+    return Response({"msg": "Blog deleted"}, status=status.HTTP_200_OK)
 
 
 @api_view(["PUT"])
 @permission_classes([IsAuthenticated])
 def update_blog(request, blog_id):
     instance = get_object_or_404(Blog, id=blog_id)
+    if instance.title == request.data["title"] and instance.content == request.data["content"]:
+        return Response({"msg": "There was nothing to update"}, status=status.HTTP_400_BAD_REQUEST)
     serializer = BlogSerializer(instance, data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response({"msg": "There was an error"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET"])
@@ -63,7 +65,7 @@ def get_comments(request, blog_id):
     instance = BlogComment.objects.filter(blog_id=blog_id).order_by("date")
     if instance:
         data = BlogCommentSerializer(instance, many=True).data
-    return Response(data)
+    return Response(data, status=status.HTTP_200_OK)
 
 
 @api_view(["POST"])
@@ -74,7 +76,7 @@ def add_comment(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     else:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response({"msg": "There was an error"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["DELETE"])
@@ -89,6 +91,8 @@ def delete_comment(request, comment_id):
 @permission_classes([IsAuthenticated])
 def update_comment(request, comment_id):
     instance = get_object_or_404(BlogComment, id=comment_id)
+    if instance.comment == request.data["comment"]:
+        return Response({"msg": "There was nothing to update"}, status=status.HTTP_400_BAD_REQUEST)
     serializer = BlogCommentSerializer(instance, data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -102,8 +106,7 @@ def update_comment(request, comment_id):
 def get_comments_anonymous(request):
     data = {}
     instances = AnonymousComment.objects.all().order_by("date")
-    if instances:
-        data = AnonymousCommentSerializer(instances, many=True).data
+    data = AnonymousCommentSerializer(instances, many=True).data
     return Response(data, status=status.HTTP_200_OK)
 
 
@@ -114,4 +117,4 @@ def add_comments_anonymous(request):
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     else:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response({"msg": "There was an error"}, status=status.HTTP_400_BAD_REQUEST)
