@@ -27,11 +27,12 @@ class MyTokenObtainPairView(TokenObtainPairView):
 @api_view(['POST'])
 def create_user(request):
     serializer = UserSerializer(data=request.data)
-    if serializer.is_valid():
+    instance = User.objects.filter(email=request.data["email"])
+    if serializer.is_valid() and not instance:
         serializer.save()
         return Response(status=status.HTTP_201_CREATED)
     else:
-        return Response(status=status.HTTP_400_BAD_REQUEST)
+        return Response({"msg": "Username or email is already in the database."}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["DELETE"])
