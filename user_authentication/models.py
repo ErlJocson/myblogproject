@@ -38,9 +38,14 @@ class CustomUserManager(BaseUserManager):
         return self.create_user(email, password, **extra_fields)
 
 
+# the user class already has first_name, last_name, and password
 class User(AbstractUser):
     username = models.CharField(max_length=24, unique=True)
     email = models.CharField(max_length=80, unique=True)
+    middle_name = models.CharField(max_length=150, blank=True, null=True)
+    birthday = models.DateField(null=True, blank=True)
+    bio = models.TextField(null=True, blank=True)
+    profile_picture = models.ImageField(upload_to="media/profile_pictures", blank=True, null=True)
 
     def __str__(self):
         return self.username

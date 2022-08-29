@@ -4,7 +4,7 @@ from user_authentication.models import User
 
 class Blog(models.Model):
     title = models.CharField(max_length=24)
-    content = models.CharField(max_length=256)
+    content = models.TextField(blank=True, null=True)
     date = models.DateField(auto_now_add=True)
     user_id = models.ForeignKey(User, on_delete=models.CASCADE)
 
