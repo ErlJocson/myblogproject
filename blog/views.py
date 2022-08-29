@@ -33,7 +33,8 @@ def add_blog(request):
     serializer = BlogSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
-    return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
+    return Response(serializer.erros, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["DELETE"])
@@ -48,13 +49,18 @@ def delete_blog(request, blog_id):
 @permission_classes([IsAuthenticated])
 def update_blog(request, blog_id):
     instance = get_object_or_404(Blog, id=blog_id)
-    if instance.title == request.data["title"] and instance.content == request.data["content"]:
-        return Response({"msg": "There was nothing to update"}, status=status.HTTP_400_BAD_REQUEST)
+
+    if instance.title == request.data["title"]:
+        return Response({"msg": "There is nothing to update in the title"}, status=status.HTTP_400_BAD_REQUEST)
+
+    if instance.content == request.data["content"]:
+        return Response({"msg": "There is nothing to update in the content"}, status=status.HTTP_400_BAD_REQUEST)
+
     serializer = BlogSerializer(instance, data=request.data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response({"msg": "There was an error"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET"])
@@ -74,8 +80,7 @@ def add_comment(request):
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    else:
-        return Response({"msg": "There was an error"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["DELETE"])
@@ -96,7 +101,7 @@ def update_comment(request, comment_id):
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 # anonymous comments
@@ -116,5 +121,4 @@ def add_comments_anonymous(request):
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    else:
-        return Response({"msg": "There was an error"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
