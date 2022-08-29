@@ -12,20 +12,19 @@ from .models import *
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_blog(request, blog_id):
-    data = {}
     instance = get_object_or_404(Blog, id=blog_id)
-    data = BlogSerializer(instance).data
-    return Response(data, status=status.HTTP_200_OK)
+    serializer = BlogSerializer(instance)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_blogs(request):
-    data = {}
     instance = Blog.objects.all().order_by('date')
     if instance:
         data = BlogSerializer(instance, many=True).data
-    return Response(data, status=status.HTTP_200_OK)
+        return Response(data, status=status.HTTP_200_OK)
+    return Response({"msg": "There are no blogs"}, status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(["POST"])
@@ -61,11 +60,11 @@ def update_blog(request, blog_id):
 @api_view(["GET"])
 @permission_classes([IsAuthenticated])
 def get_comments(request, blog_id):
-    data = {}
     instance = BlogComment.objects.filter(blog_id=blog_id).order_by("date")
     if instance:
         data = BlogCommentSerializer(instance, many=True).data
-    return Response(data, status=status.HTTP_200_OK)
+        return Response(data, status=status.HTTP_200_OK)
+    return Response({"msg": "There are no comments"}, status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(["POST"])
@@ -104,10 +103,11 @@ def update_comment(request, comment_id):
 # the following functions will allow anyone to comment on a blog
 @api_view(["GET"])
 def get_comments_anonymous(request):
-    data = {}
     instances = AnonymousComment.objects.all().order_by("date")
-    data = AnonymousCommentSerializer(instances, many=True).data
-    return Response(data, status=status.HTTP_200_OK)
+    if instances:
+        data = AnonymousCommentSerializer(instances, many=True).data
+        return Response(data, status=status.HTTP_200_OK)
+    return Response({"msg": "There are no anonymous comments"}, status=status.HTTP_204_NO_CONTENT)
 
 
 @api_view(["POST"])

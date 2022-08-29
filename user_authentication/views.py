@@ -51,4 +51,3 @@ def update_user(request, user_id):
     if serializer.is_valid():
         serializer.save()
     return Response({"msg": "User information updated"}, status=status.HTTP_200_OK)
-
