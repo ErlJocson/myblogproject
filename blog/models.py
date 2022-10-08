@@ -19,5 +19,5 @@ class BlogComment(models.Model):
 
 
 class Vote(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
-    blog = models.OneToOneField(Blog, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)

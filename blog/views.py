@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
-from .serializers import  BlogCommentSerializer, BlogSerializer, VoteSerializer
+from .serializers import BlogCommentSerializer, BlogSerializer, VoteSerializer
 from .models import Blog, BlogComment, Vote
 
 
@@ -71,7 +71,7 @@ def update_blog(request, blog_id):
     instance = get_object_or_404(Blog, id=blog_id)
 
     if instance.title == request.data["title"] and instance.content == request.data["content"]:
-        return Response({"msg":"There was nothing to update"}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"msg": "There was nothing to update"}, status=status.HTTP_400_BAD_REQUEST)
 
     serializer = BlogSerializer(instance, data=request.data)
     if serializer.is_valid():
@@ -110,7 +110,6 @@ def add_comment(request):
         "user": 1,
         "blog": 1
     }
-    
 
     user and blog are integers that represent 
     the id of the user and blog
@@ -126,8 +125,10 @@ def add_comment(request):
 @permission_classes([IsAuthenticated])
 def delete_comment(request, comment_id):
     instance = get_object_or_404(BlogComment, id=comment_id)
-    instance.delete()
-    return Response(status=status.HTTP_200_OK)
+    if instance:
+        instance.delete()
+        return Response(status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["PUT"])
@@ -159,14 +160,26 @@ def update_comment(request, comment_id):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def add_vote(request, blog_id):
+    """
+    This function will add new votes to the database.
+    Sample json object:
+    {
+        "user": 1,
+        "blog": 1
+    }
+    """
     instance = get_object_or_404(Blog, id=blog_id)
-    serializer = VoteSerializer(data=request.data)
-    if serializer.is_valid():
-        instance.votes = instance.votes + 1
-        serializer.save()
-        instance.save()
-        return Response(status=status.HTTP_200_OK)
-    return Response(status=status.HTTP_400_BAD_REQUEST)
+    check_if_already_voted = Vote.objects.filter(user=request.user.id, blog=blog_id)
+    if not check_if_already_voted:
+        serializer = VoteSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            instance.votes = instance.votes + 1
+            instance.save()
+            return Response(status=status.HTTP_200_OK)
+        else:
+            return Response({"msg": "Cannot vote the blog"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response({"msg": "You've already voted the blog"}, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["DELETE"])
@@ -174,8 +187,9 @@ def add_vote(request, blog_id):
 def remove_vote(request, blog_id):
     instance = get_object_or_404(Blog, id=blog_id)
     vote_instance = get_object_or_404(Vote, blog=instance.id)
-    instance.votes = instance.votes - 1
-    vote_instance.delete()
-    instance.save()
-    return Response(status=status.HTTP_200_OK)
-    
+    if instance and vote_instance:
+        instance.votes = instance.votes - 1
+        vote_instance.delete()
+        instance.save()
+        return Response(status=status.HTTP_200_OK)
+    return Response(status=status.HTTP_400_BAD_REQUEST)
