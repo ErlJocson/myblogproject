@@ -1,3 +1,4 @@
+from enum import unique
 from django.db import models
 from user_authentication.models import User
 
@@ -18,5 +19,5 @@ class BlogComment(models.Model):
 
 
 class Vote(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
-    blog = models.ForeignKey(Blog, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE, unique=True)
+    blog = models.ForeignKey(Blog, on_delete=models.CASCADE, unique=True)

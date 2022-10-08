@@ -12,7 +12,7 @@ urlpatterns = [
     path("delete-comment/<int:comment_id>", delete_comment),
     path("update-comment/<int:comment_id>", update_comment),
     path("add-comment/", add_comment),
-    path("get-comment/", get_comment),
+    path("get-comment/<int:comment_id>", get_comment),
 
     path("add-vote/<int:blog_id>", add_vote),
     path("remove-vote/<int:blog_id>", remove_vote),

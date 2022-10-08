@@ -9,6 +9,7 @@ class BlogSerializer(serializers.ModelSerializer):
             "title",
             'content',
             "user",
+            "votes",
         ]
         read_only_fields = ["date"]
 
@@ -18,7 +19,7 @@ class BlogCommentSerializer(serializers.ModelSerializer):
         model = BlogComment
         fields = [
             "id",
-            "comment",
+            "content",
             "user",
             "blog"
         ]

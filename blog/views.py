@@ -101,6 +101,20 @@ def get_comment(request, comment_id):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def add_comment(request):
+    """
+    This function adds new comments in the database.
+
+    sample json object:
+    {
+        "content": "blog comment",
+        "user": 1,
+        "blog": 1
+    }
+    
+
+    user and blog are integers that represent 
+    the id of the user and blog
+    """
     serializer = BlogCommentSerializer(data=request.data)
     if serializer.is_valid():
         serializer.save()
@@ -113,14 +127,27 @@ def add_comment(request):
 def delete_comment(request, comment_id):
     instance = get_object_or_404(BlogComment, id=comment_id)
     instance.delete()
-    return Response(status=status.HTTP_201_CREATED)
+    return Response(status=status.HTTP_200_OK)
 
 
 @api_view(["PUT"])
 @permission_classes([IsAuthenticated])
 def update_comment(request, comment_id):
+    """
+    This function updates a comment
+
+    sample json object:
+    {
+        "content":"Updated comment",
+        "user":1,
+        "blog":1
+    }
+    
+    user and blog are integers that represent
+    the id of the user and the id of the blog
+    """
     instance = get_object_or_404(BlogComment, id=comment_id)
-    if instance.comment == request.data["comment"]:
+    if instance.content == request.data["content"]:
         return Response({"msg": "There was nothing to update"}, status=status.HTTP_400_BAD_REQUEST)
     serializer = BlogCommentSerializer(instance, data=request.data)
     if serializer.is_valid():
@@ -133,9 +160,11 @@ def update_comment(request, comment_id):
 @permission_classes([IsAuthenticated])
 def add_vote(request, blog_id):
     instance = get_object_or_404(Blog, id=blog_id)
-    serializer = VoteSerializer(user=request.user, blog=instance)
+    serializer = VoteSerializer(data=request.data)
     if serializer.is_valid():
+        instance.votes = instance.votes + 1
         serializer.save()
+        instance.save()
         return Response(status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
 
@@ -144,7 +173,9 @@ def add_vote(request, blog_id):
 @permission_classes([IsAuthenticated])
 def remove_vote(request, blog_id):
     instance = get_object_or_404(Blog, id=blog_id)
-    vote_instance = get_object_or_404(Vote, blog_id=instance.id)
+    vote_instance = get_object_or_404(Vote, blog=instance.id)
+    instance.votes = instance.votes - 1
     vote_instance.delete()
+    instance.save()
     return Response(status=status.HTTP_200_OK)
     
