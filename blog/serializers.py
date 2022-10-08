@@ -1,12 +1,5 @@
-from dataclasses import field
 from .models import *
 from rest_framework import serializers
-
-
-class TopicSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Topic
-        field = ["name"]
 
 class BlogSerializer(serializers.ModelSerializer):
     class Meta:
@@ -15,7 +8,7 @@ class BlogSerializer(serializers.ModelSerializer):
             "id",
             "title",
             'content',
-            "user"
+            "user",
         ]
         read_only_fields = ["date"]
 
