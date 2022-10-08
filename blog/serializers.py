@@ -1,6 +1,12 @@
+from dataclasses import field
 from .models import *
 from rest_framework import serializers
 
+
+class TopicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Topic
+        field = ["name"]
 
 class BlogSerializer(serializers.ModelSerializer):
     class Meta:
@@ -9,7 +15,7 @@ class BlogSerializer(serializers.ModelSerializer):
             "id",
             "title",
             'content',
-            "user_id"
+            "user"
         ]
         read_only_fields = ["date"]
 
@@ -20,19 +26,13 @@ class BlogCommentSerializer(serializers.ModelSerializer):
         fields = [
             "id",
             "comment",
-            "user_id",
-            "blog_id"
+            "user",
+            "blog"
         ]
         read_only_fields = ["date"]
 
 
-class AnonymousCommentSerializer(serializers.ModelSerializer):
+class VoteSerializer(serializers.ModelSerializer):
     class Meta:
-        model = AnonymousComment
-        fields = [
-            "id",
-            "comment",
-            "name",
-            "email",
-        ]
-        read_only_fields = ["date"]
+        model = Vote
+        fields = ["user", "blog"]

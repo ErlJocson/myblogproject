@@ -1,3 +1,4 @@
+from xml.etree.ElementTree import Comment
 from django.shortcuts import get_object_or_404
 
 from rest_framework.response import Response
@@ -5,8 +6,8 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status
 
-from .serializers import *
-from .models import *
+from .serializers import TopicSerializer, BlogCommentSerializer, BlogSerializer, VoteSerializer
+from .models import Topic, Blog, BlogComment, Vote
 
 
 @api_view(["GET"])
@@ -50,11 +51,8 @@ def delete_blog(request, blog_id):
 def update_blog(request, blog_id):
     instance = get_object_or_404(Blog, id=blog_id)
 
-    if instance.title == request.data["title"]:
-        return Response({"msg": "There is nothing to update in the title"}, status=status.HTTP_400_BAD_REQUEST)
-
-    if instance.content == request.data["content"]:
-        return Response({"msg": "There is nothing to update in the content"}, status=status.HTTP_400_BAD_REQUEST)
+    if instance.topic == request.data["topic"] and instance.title == request.data["title"] and instance.content == request.data["content"]:
+        return Response({"msg":"There was nothing to update"}, status=status.HTTP_400_BAD_REQUEST)
 
     serializer = BlogSerializer(instance, data=request.data)
     if serializer.is_valid():
@@ -72,6 +70,13 @@ def get_comments(request, blog_id):
         return Response(data, status=status.HTTP_200_OK)
     return Response({"msg": "There are no comments"}, status=status.HTTP_204_NO_CONTENT)
 
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def get_comment(request, comment_id):
+    instance = get_object_or_404(BlogComment, id=comment_id)
+    serializer = BlogCommentSerializer(instance)
+    return Response(serializer.data, status=status.HTTP_200_OK)
 
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
@@ -103,22 +108,17 @@ def update_comment(request, comment_id):
         return Response(serializer.data, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-# anonymous comments
-# the following functions will allow anyone to comment on a blog
-@api_view(["GET"])
-def get_comments_anonymous(request):
-    instances = AnonymousComment.objects.all().order_by("date")
-    if instances:
-        data = AnonymousCommentSerializer(instances, many=True).data
-        return Response(data, status=status.HTTP_200_OK)
-    return Response({"msg": "There are no anonymous comments"}, status=status.HTTP_204_NO_CONTENT)
-
-
+# TODO: add the vote
 @api_view(["POST"])
-def add_comments_anonymous(request):
-    serializer = AnonymousCommentSerializer(data=request.data)
-    if serializer.is_valid():
-        serializer.save()
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+@permission_classes([IsAuthenticated])
+def add_vote(request, blog_id):
+    instance = get_object_or_404(Blog, id=blog_id)
+    new_vote = VoteSerializer()
+    return Response({}, status=status.HTTP_200_OK)
+
+
+# TODO: make the delete work
+@api_view(["DELETE"])
+@permission_classes([IsAuthenticated])
+def remove_vote(request, blog_id):
+    return Response({}, status=status.HTTP_200_OK)
