@@ -1,3 +1,4 @@
+from django.contrib.auth import logout
 from django.shortcuts import get_object_or_404
 from .models import User
 
@@ -50,3 +51,11 @@ def update_user(request, user_id):
         serializer.save()
         return Response({"msg": "User information updated"}, status=status.HTTP_200_OK)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(["GET"])
+@permission_classes([IsAuthenticated])
+def logout_user(request):
+    request.user.auth_token.delete()
+    logout(request)
+    return Response(status=status.HTTP_200_OK)
